@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Live4 Web Tool</title>
+    <link href="./jquery-ui-1.13.2/jquery-ui.css" rel="stylesheet">
+    <script src="./js/crypto-js.min.js"></script>
+    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script src="./jquery-ui-1.13.2/jquery-ui.js"></script>
+    <script>
+        // 註冊事件
+        $(window).on('load', function () {
+            $("#tabs").tabs();
+
+            // 網頁加密
+            $("#web-encrypt-station-default").click(function () {
+                $("#web-encrypt-station").val("9010000000");
+            });
+            $("#web-encrypt-iv-random").click(function () {
+                $("#web-encrypt-iv").val(randomString(16));
+            });
+            $("#web-encrypt").click(function () {
+                // 清空舊資料
+                $("#web-encrypt-ciphertext").val("");
+
+                // 檢查輸入
+                var station = $("#web-encrypt-station").val();
+                if (!station || station.length != 10) {
+                    alert("Station 長度錯誤")
+                    return
+                }
+
+                var iv = $("#web-encrypt-iv").val();
+                if (!iv || iv.length != 16) {
+                    alert("IV 長度錯誤")
+                    return
+                }
+
+                // 加密
+                try {
+                    var content = $("#web-encrypt-content").val();
+                    var key = station + "000000";
+                    var encryptResult = encryptAes(content, key, iv);
+                    var ciphertext = encodeBase64(iv + encryptResult);
+                    $("#web-encrypt-ciphertext").val(ciphertext);
+                } catch (e) {
+                    console.error(e)
+                }
+
+                // 加密結果
+                if (!ciphertext) {
+                    alert("網頁加密失敗");
+                } else {
+                    alert("網頁加密成功");
+                }
+            });
+            $("#web-encrypt-ciphertext-clear").click(function () {
+                $("#web-encrypt-ciphertext").val("");
+            });
+
+            // 網頁解密
+            $("#web-decrypt-station-default").click(function () {
+                $("#web-decrypt-station").val("9010000000");
+            });
+            $("#web-decrypt").click(function () {
+                // 清空舊資料
+                $("#web-decrypt-iv").val("");
+                $("#web-decrypt-content").val("");
+
+                // 檢查輸入
+                var station = $("#web-decrypt-station").val();
+                if (!station || station.length != 10) {
+                    alert("Station 長度錯誤")
+                    return
+                }
+
+                // 解密
+                try {
+                    var ciphertext = $("#web-decrypt-ciphertext").val();
+                    var decodeCiphertext = decodeBase64(ciphertext);
+                    var aesCiphertext = decodeCiphertext.slice(16);
+                    var key = station + "000000";
+                    var iv = decodeCiphertext.slice(0, 16);
+                    $("#web-decrypt-iv").val(iv);
+                    var content = decryptAes(aesCiphertext, key, iv);
+                    $("#web-decrypt-content").val(content);
+                    alert("網頁解密成功");
+                } catch (e) {
+                    console.error(e)
+                    alert("網頁解密失敗");
+                }
+            });
+            $("#web-decrypt-content-clear").click(function () {
+                $("#web-decrypt-content").val("");
+            });
+
+            // Open API 加密
+            $("#openapi-encode").click(function () {
+                // 清空舊資料
+                $("#openapi-encode-info").val("");
+                $("#openapi-encode-sign").val("");
+
+                // 加密
+                try {
+                    var saltKey = $("#openapi-encode-salt").val();
+                    var content = $("#openapi-encode-content").val(); 
+                    var info = encodeBase64(content);
+                    var sign = CryptoJS.MD5(info + saltKey).toString();
+                    $("#openapi-encode-info").val(info);
+                    $("#openapi-encode-sign").val(sign);
+                } catch (e) {
+                    console.error(e)
+                }
+
+                // 加密結果
+                if (!info || !sign) {
+                    alert("OpenAPI 加密失敗");
+                } else {
+                    alert("OpenAPI 加密成功");
+                }
+            });
+            $("#openapi-encode-result-clear").click(function () {
+                $("#openapi-encode-info").val("");
+                $("#openapi-encode-sign").val("");
+            });
+
+            // Open API 解密
+            $("#openapi-decode").click(function () {
+                // 清空舊資料
+                $("#openapi-decode-content").val("");
+
+                // 解密
+                try {
+                    var saltKey = $("#openapi-decode-salt").val();
+                    var info = $("#openapi-decode-info").val();
+                    var sign = $("#openapi-decode-sign").val();
+                    var content = decodeBase64(info);
+                    $("#openapi-decode-content").val(content);
+
+                    var correctSign = CryptoJS.MD5(info + saltKey).toString();
+                    if (sign != correctSign) {
+                        alert("Sign 錯誤");
+                        return;
+                    }
+
+                    alert("OpenAPI 解密成功");
+                } catch (e) {
+                    console.error(e)
+                    alert("OpenAPI 解密失敗");
+                }
+            });
+            $("#openapi-decode-content-clear").click(function () {
+                $("#openapi-decode-content").val("");
+            });
+
+            // Config 加密
+            $("#config-encrypt-iv-random").click(function () {
+                $("#config-encrypt-iv").val(randomString(16));
+            });
+            $("#config-encrypt").click(function () {
+                // 清空舊資料
+                $("#config-encrypt-ciphertext").val("");
+
+                // 檢查輸入
+                var key = $("#config-encrypt-secret").val();
+                if (!key || key.length != 16) {
+                    alert("Secret 長度錯誤")
+                    return
+                }
+
+                var iv = $("#config-encrypt-iv").val();
+                if (!iv || iv.length != 16) {
+                    alert("IV 長度錯誤")
+                    return
+                }
+
+                // 加密
+                try {
+                    var content = $("#config-encrypt-content").val();
+                    var ciphertext = encryptAes(content, key, iv);
+                    $("#config-encrypt-ciphertext").val(ciphertext);
+                } catch (e) {
+                    console.error(e)
+                }
+
+                // 加密結果
+                if (!ciphertext) {
+                    alert("Config 加密失敗");
+                } else {
+                    alert("Config 加密成功");
+                }
+            });
+            $("#config-encrypt-ciphertext-clear").click(function () {
+                $("#config-encrypt-ciphertext").val("");
+            });
+
+            // Config 解密
+            $("#config-decrypt").click(function () {
+                // 清空舊資料
+                $("#config-decrypt-content").val("");
+
+                // 檢查輸入
+                var key = $("#config-decrypt-secret").val();
+                if (!key || key.length != 16) {
+                    alert("Secret 長度錯誤")
+                    return
+                }
+
+                var iv = $("#config-decrypt-iv").val();
+                if (!iv || iv.length != 16) {
+                    alert("IV 長度錯誤")
+                    return
+                }
+
+                // 解密
+                try {
+                    var ciphertext = $("#config-decrypt-ciphertext").val();
+                    var content = decryptAes(ciphertext, key, iv);
+                    $("#config-decrypt-content").val(content);
+                    alert("Config 解密成功");
+                } catch (e) {
+                    console.error(e)
+                    alert("Config 解密失敗");
+                }
+            });
+            $("#config-decrypt-content-clear").click(function () {
+                $("#config-decrypt-content").val("");
+            });
+        });
+
+        function randomString(length) {
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const charactersLength = characters.length;
+            let counter = 0;
+            while (counter < length) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                counter += 1;
+            }
+            return result;
+        }
+
+        function encodeBase64(words) {
+            var utf8Words = CryptoJS.enc.Utf8.parse(words);
+            return CryptoJS.enc.Base64.stringify(utf8Words);
+        }
+
+        function decodeBase64(base64) {
+            var words = CryptoJS.enc.Base64.parse(base64);
+            return CryptoJS.enc.Utf8.stringify(words);
+        }
+
+        function encryptAes(ciphertext, key, iv) {
+            var keyWA = CryptoJS.enc.Utf8.parse(key);
+            var ivWA = CryptoJS.enc.Utf8.parse(iv);
+
+            var encrypted = CryptoJS.AES.encrypt(
+                ciphertext,
+                keyWA,
+                {
+                    iv: ivWA,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+
+            return encrypted;
+        }
+
+        function decryptAes(ciphertext, key, iv) {
+            var keyWA = CryptoJS.enc.Utf8.parse(key);
+            var ivWA = CryptoJS.enc.Utf8.parse(iv);
+
+            var decrypted = CryptoJS.AES.decrypt(
+                ciphertext,
+                keyWA,
+                {
+                    iv: ivWA,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        }
+    </script>
+</head>
+
+<body>
+    <div id="tabs">
+        <ul>
+            <li>
+                <a href="#tabs-1">網頁加密</a>
+            </li>
+            <li>
+                <a href="#tabs-2">網頁解密</a>
+            </li>
+            <li>
+                <a href="#tabs-3">OpenAPI 加密</a>
+            </li>
+            <li>
+                <a href="#tabs-4">OpenAPI 解密</a>
+            </li>
+            <li>
+                <a href="#tabs-5">Config 加密</a>
+            </li>
+            <li>
+                <a href="#tabs-6">Config 解密</a>
+            </li>
+        </ul>
+        <div id="tabs-1">
+            <form>
+                <label for="web-encrypt-station">Sation:</label>
+                <br>
+                <input type="text" id="web-encrypt-station" name="station">
+                <button type="button" id="web-encrypt-station-default">Default</button>
+                <br>
+                <label for="web-encrypt-iv">IV:</label>
+                <br>
+                <input type="text" id="web-encrypt-iv" name="iv">
+                <button type="button" id="web-encrypt-iv-random">Random</button>
+                <br>
+                <label for="web-encrypt-content">Content:</label>
+                <br>
+                <textarea id="web-encrypt-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="web-encrypt">Encrypt</button>
+                <button type="button" id="web-encrypt-ciphertext-clear">Clear</button>
+            </form>
+            <form>
+                <label for="web-encrypt-ciphertext">Ciphertext:</label>
+                <br>
+                <textarea id="web-encrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+            </form>
+        </div>
+        <div id="tabs-2">
+            <form>
+                <label for="web-decrypt-station">
+                    <a href="./img/station.png" target="_blank">Sation:</a>
+                </label>
+                <br>
+                <input type="text" id="web-decrypt-station" name="station">
+                <button type="button" id="web-decrypt-station-default">Default</button>
+                <br>
+                <label for="web-decrypt-ciphertext">
+                    <a href="./img/ciphertext.png" target="_blank">Ciphertext:</a>
+                </label>
+                <br>
+                <textarea id="web-decrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="web-decrypt">Decrypt</button>
+                <button type="button" id="web-decrypt-content-clear">Clear</button>
+            </form>
+            <form>
+                <label for="web-decrypt-iv">IV:</label>
+                <br>
+                <input type="text" id="web-decrypt-iv" name="iv">
+                <br>
+                <label for="web-decrypt-content">Content:</label>
+                <br>
+                <textarea id="web-decrypt-content" name="content" rows="8" cols="100"></textarea>
+            </form>
+        </div>
+        <div id="tabs-3">
+            <form>
+                <label for="openapi-encode-salt">Salt Key:</label>
+                <br>
+                <input type="text" id="openapi-encode-salt" name="salt">
+                <br>
+                <label for="openapi-encode-content">Content:</label>
+                <br>
+                <textarea id="openapi-encode-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="openapi-encode">Decrypt</button>
+                <button type="button" id="openapi-encode-result-clear">Clear</button>
+            </form>
+            <form>
+                <label for="openapi-encode-info">Info:</label>
+                <br>
+                <textarea id="openapi-encode-info" name="info" rows="8" cols="100"></textarea>
+                <br>
+                <label for="openapi-encode-sign">Sign:</label>
+                <br>
+                <textarea id="openapi-encode-sign" name="sign" rows="4" cols="100"></textarea>
+            </form>
+        </div>
+        <div id="tabs-4">
+            <form>
+                <label for="openapi-decode-salt">Salt Key:</label>
+                <br>
+                <input type="text" id="openapi-decode-salt" name="salt">
+                <br>
+                <label for="openapi-decode-info">Info:</label>
+                <br>
+                <textarea id="openapi-decode-info" name="info" rows="8" cols="100"></textarea>
+                <br>
+                <label for="openapi-decode-sign">Sign:</label>
+                <br>
+                <textarea id="openapi-decode-sign" name="sign" rows="4" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="openapi-decode">Decrypt</button>
+                <button type="button" id="openapi-decode-content-clear">Clear</button>
+            </form>
+            <form>
+                <label for="openapi-decode-content">Content:</label>
+                <br>
+                <textarea id="openapi-decode-content" name="content" rows="8" cols="100"></textarea>
+            </form>
+        </div>
+        <div id="tabs-5">
+            <form>
+                <label for="config-encrypt-secret">Secret:</label>
+                <br>
+                <input type="text" id="config-encrypt-secret" name="secret">
+                <br>
+                <label for="config-encrypt-iv">IV:</label>
+                <br>
+                <input type="text" id="config-encrypt-iv" name="iv">
+                <button type="button" id="config-encrypt-iv-random">Random</button>
+                <br>
+                <label for="config-encrypt-content">Content:</label>
+                <br>
+                <textarea id="config-encrypt-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="config-encrypt">Encrypt</button>
+                <button type="button" id="config-encrypt-ciphertext-clear">Clear</button>
+            </form>
+            <form>
+                <label for="config-encrypt-ciphertext">Ciphertext:</label>
+                <br>
+                <textarea id="config-encrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+            </form>
+        </div>
+        <div id="tabs-6">
+            <form>
+                <label for="config-decrypt-secret">Secret:</label>
+                <br>
+                <input type="text" id="config-decrypt-secret" name="secret">
+                <br>
+                <label for="config-decrypt-iv">IV:</label>
+                <br>
+                <input type="text" id="config-decrypt-iv" name="iv">
+                <br>
+                <label for="config-decrypt-ciphertext">Ciphertext:</label>
+                <br>
+                <textarea id="config-decrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="config-decrypt">Decrypt</button>
+                <button type="button" id="config-decrypt-content-clear">Clear</button>
+            </form>
+            <form>
+                <label for="config-decrypt-content">Content:</label>
+                <br>
+                <textarea id="config-decrypt-content" name="content" rows="8" cols="100"></textarea>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
