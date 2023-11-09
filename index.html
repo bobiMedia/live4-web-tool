@@ -90,6 +90,15 @@
                     alert("網頁解密失敗");
                 }
             });
+            $("#web-decrypt-content-format").click(function () {
+                try {
+                    var content = $("#web-decrypt-content").val();
+                    content = formatJson(content)
+                    if (content) {
+                        $("#web-decrypt-content").val(content);
+                    }
+                } catch (e) { }
+            });
             $("#web-decrypt-content-clear").click(function () {
                 $("#web-decrypt-content").val("");
             });
@@ -103,7 +112,7 @@
                 // 加密
                 try {
                     var saltKey = $("#openapi-encode-salt").val();
-                    var content = $("#openapi-encode-content").val(); 
+                    var content = $("#openapi-encode-content").val();
                     var info = encodeBase64(content);
                     var sign = CryptoJS.MD5(info + saltKey).toString();
                     $("#openapi-encode-info").val(info);
@@ -148,6 +157,15 @@
                     console.error(e)
                     alert("OpenAPI 解密失敗");
                 }
+            });
+            $("#openapi-decode-content-format").click(function () {
+                try {
+                    var content = $("#openapi-decode-content").val();
+                    content = formatJson(content)
+                    if (content) {
+                        $("#openapi-decode-content").val(content);
+                    }
+                } catch (e) { }
             });
             $("#openapi-decode-content-clear").click(function () {
                 $("#openapi-decode-content").val("");
@@ -283,6 +301,11 @@
 
             return decrypted.toString(CryptoJS.enc.Utf8);
         }
+
+        function formatJson(str) {
+            var obj = JSON.parse(str)
+            return JSON.stringify(obj, null, 4)
+        }
     </script>
 </head>
 
@@ -351,6 +374,7 @@
                 <br>
                 <br>
                 <button type="button" id="web-decrypt">Decrypt</button>
+                <button type="button" id="web-decrypt-content-format">Format</button>
                 <button type="button" id="web-decrypt-content-clear">Clear</button>
             </form>
             <form>
@@ -403,6 +427,7 @@
                 <br>
                 <br>
                 <button type="button" id="openapi-decode">Decrypt</button>
+                <button type="button" id="openapi-decode-content-format">Format</button>
                 <button type="button" id="openapi-decode-content-clear">Clear</button>
             </form>
             <form>
