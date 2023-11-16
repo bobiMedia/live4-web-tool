@@ -54,6 +54,10 @@
                     alert("網頁加密成功");
                 }
             });
+            $("#web-encrypt-copy").click(function () {
+                var val = $("#web-encrypt-ciphertext").val();
+                navigator.clipboard.writeText(val);
+            });
             $("#web-encrypt-ciphertext-clear").click(function () {
                 $("#web-encrypt-ciphertext").val("");
             });
@@ -99,6 +103,10 @@
                     }
                 } catch (e) { }
             });
+            $("#web-decrypt-content-copy").click(function () {
+                var val = $("#web-decrypt-content").val();
+                navigator.clipboard.writeText(val);
+            });
             $("#web-decrypt-content-clear").click(function () {
                 $("#web-decrypt-content").val("");
             });
@@ -127,6 +135,12 @@
                 } else {
                     alert("OpenAPI 加密成功");
                 }
+            });
+            $("#openapi-encode-copy").click(function () {
+                var info = $("#openapi-encode-info").val();
+                var sign = $("#openapi-encode-sign").val();
+                var query = "?info=" + info + "&sign=" + sign;
+                navigator.clipboard.writeText(query);
             });
             $("#openapi-encode-result-clear").click(function () {
                 $("#openapi-encode-info").val("");
@@ -167,26 +181,30 @@
                     }
                 } catch (e) { }
             });
+            $("#openapi-decode-content-copy").click(function () {
+                var val = $("#openapi-decode-content").val();
+                navigator.clipboard.writeText(val);
+            });
             $("#openapi-decode-content-clear").click(function () {
                 $("#openapi-decode-content").val("");
             });
 
             // Config 加密
-            $("#config-encrypt-iv-random").click(function () {
-                $("#config-encrypt-iv").val(randomString(16));
+            $("#aes-encrypt-iv-random").click(function () {
+                $("#aes-encrypt-iv").val(randomString(16));
             });
-            $("#config-encrypt").click(function () {
+            $("#aes-encrypt").click(function () {
                 // 清空舊資料
-                $("#config-encrypt-ciphertext").val("");
+                $("#aes-encrypt-ciphertext").val("");
 
                 // 檢查輸入
-                var key = $("#config-encrypt-secret").val();
+                var key = $("#aes-encrypt-secret").val();
                 if (!key || key.length != 16) {
                     alert("Secret 長度錯誤")
                     return
                 }
 
-                var iv = $("#config-encrypt-iv").val();
+                var iv = $("#aes-encrypt-iv").val();
                 if (!iv || iv.length != 16) {
                     alert("IV 長度錯誤")
                     return
@@ -194,9 +212,9 @@
 
                 // 加密
                 try {
-                    var content = $("#config-encrypt-content").val();
+                    var content = $("#aes-encrypt-content").val();
                     var ciphertext = encryptAes(content, key, iv);
-                    $("#config-encrypt-ciphertext").val(ciphertext);
+                    $("#aes-encrypt-ciphertext").val(ciphertext);
                 } catch (e) {
                     console.error(e)
                 }
@@ -208,23 +226,27 @@
                     alert("Config 加密成功");
                 }
             });
-            $("#config-encrypt-ciphertext-clear").click(function () {
-                $("#config-encrypt-ciphertext").val("");
+            $("#aes-encrypt-ciphertext-copy").click(function () {
+                var val = $("#aes-encrypt-ciphertext").val();
+                navigator.clipboard.writeText(val);
+            });
+            $("#aes-encrypt-ciphertext-clear").click(function () {
+                $("#aes-encrypt-ciphertext").val("");
             });
 
             // Config 解密
-            $("#config-decrypt").click(function () {
+            $("#aes-decrypt").click(function () {
                 // 清空舊資料
-                $("#config-decrypt-content").val("");
+                $("#aes-decrypt-content").val("");
 
                 // 檢查輸入
-                var key = $("#config-decrypt-secret").val();
+                var key = $("#aes-decrypt-secret").val();
                 if (!key || key.length != 16) {
                     alert("Secret 長度錯誤")
                     return
                 }
 
-                var iv = $("#config-decrypt-iv").val();
+                var iv = $("#aes-decrypt-iv").val();
                 if (!iv || iv.length != 16) {
                     alert("IV 長度錯誤")
                     return
@@ -232,17 +254,21 @@
 
                 // 解密
                 try {
-                    var ciphertext = $("#config-decrypt-ciphertext").val();
+                    var ciphertext = $("#aes-decrypt-ciphertext").val();
                     var content = decryptAes(ciphertext, key, iv);
-                    $("#config-decrypt-content").val(content);
+                    $("#aes-decrypt-content").val(content);
                     alert("Config 解密成功");
                 } catch (e) {
                     console.error(e)
                     alert("Config 解密失敗");
                 }
             });
-            $("#config-decrypt-content-clear").click(function () {
-                $("#config-decrypt-content").val("");
+            $("#aes-decrypt-content-copy").click(function () {
+                var val = $("#aes-decrypt-content").val();
+                navigator.clipboard.writeText(val);
+            });
+            $("#aes-decrypt-content-clear").click(function () {
+                $("#aes-decrypt-content").val("");
             });
         });
 
@@ -325,10 +351,10 @@
                 <a href="#tabs-4">OpenAPI 解密</a>
             </li>
             <li>
-                <a href="#tabs-5">Config 加密</a>
+                <a href="#tabs-5">AES 加密 (Config 加密)</a>
             </li>
             <li>
-                <a href="#tabs-6">Config 解密</a>
+                <a href="#tabs-6">AES 解密 (Config 解密)</a>
             </li>
         </ul>
         <div id="tabs-1">
@@ -354,7 +380,7 @@
             <form>
                 <label for="web-encrypt-ciphertext">Ciphertext:</label>
                 <br>
-                <textarea id="web-encrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="web-encrypt-ciphertext" name="ciphertext" rows="8" cols="100" disabled></textarea>
             </form>
         </div>
         <div id="tabs-2">
@@ -375,16 +401,17 @@
                 <br>
                 <button type="button" id="web-decrypt">Decrypt</button>
                 <button type="button" id="web-decrypt-content-format">Format</button>
+                <button type="button" id="web-decrypt-content-copy">Copy Content</button>
                 <button type="button" id="web-decrypt-content-clear">Clear</button>
             </form>
             <form>
                 <label for="web-decrypt-iv">IV:</label>
                 <br>
-                <input type="text" id="web-decrypt-iv" name="iv">
+                <input type="text" id="web-decrypt-iv" name="iv" disabled>
                 <br>
                 <label for="web-decrypt-content">Content:</label>
                 <br>
-                <textarea id="web-decrypt-content" name="content" rows="8" cols="100"></textarea>
+                <textarea id="web-decrypt-content" name="content" rows="8" cols="100" disabled></textarea>
             </form>
         </div>
         <div id="tabs-3">
@@ -399,16 +426,17 @@
                 <br>
                 <br>
                 <button type="button" id="openapi-encode">Decrypt</button>
+                <button type="button" id="openapi-encode-copy">Copy Query String</button>
                 <button type="button" id="openapi-encode-result-clear">Clear</button>
             </form>
             <form>
                 <label for="openapi-encode-info">Info:</label>
                 <br>
-                <textarea id="openapi-encode-info" name="info" rows="8" cols="100"></textarea>
+                <textarea id="openapi-encode-info" name="info" rows="8" cols="100" disabled></textarea>
                 <br>
                 <label for="openapi-encode-sign">Sign:</label>
                 <br>
-                <textarea id="openapi-encode-sign" name="sign" rows="4" cols="100"></textarea>
+                <textarea id="openapi-encode-sign" name="sign" rows="4" cols="100" disabled></textarea>
             </form>
         </div>
         <div id="tabs-4">
@@ -428,61 +456,64 @@
                 <br>
                 <button type="button" id="openapi-decode">Decrypt</button>
                 <button type="button" id="openapi-decode-content-format">Format</button>
+                <button type="button" id="openapi-decode-content-copy">Copy</button>
                 <button type="button" id="openapi-decode-content-clear">Clear</button>
             </form>
             <form>
                 <label for="openapi-decode-content">Content:</label>
                 <br>
-                <textarea id="openapi-decode-content" name="content" rows="8" cols="100"></textarea>
+                <textarea id="openapi-decode-content" name="content" rows="8" cols="100" disabled></textarea>
             </form>
         </div>
         <div id="tabs-5">
             <form>
-                <label for="config-encrypt-secret">Secret:</label>
+                <label for="aes-encrypt-secret">Secret:</label>
                 <br>
-                <input type="text" id="config-encrypt-secret" name="secret">
+                <input type="text" id="aes-encrypt-secret" name="secret">
                 <br>
-                <label for="config-encrypt-iv">IV:</label>
+                <label for="aes-encrypt-iv">IV:</label>
                 <br>
-                <input type="text" id="config-encrypt-iv" name="iv">
-                <button type="button" id="config-encrypt-iv-random">Random</button>
+                <input type="text" id="aes-encrypt-iv" name="iv">
+                <button type="button" id="aes-encrypt-iv-random">Random</button>
                 <br>
-                <label for="config-encrypt-content">Content:</label>
+                <label for="aes-encrypt-content">Content:</label>
                 <br>
-                <textarea id="config-encrypt-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="aes-encrypt-content" name="ciphertext" rows="8" cols="100"></textarea>
                 <br>
                 <br>
-                <button type="button" id="config-encrypt">Encrypt</button>
-                <button type="button" id="config-encrypt-ciphertext-clear">Clear</button>
+                <button type="button" id="aes-encrypt">Encrypt</button>
+                <button type="button" id="aes-encrypt-ciphertext-copy">Copy</button>
+                <button type="button" id="aes-encrypt-ciphertext-clear">Clear</button>
             </form>
             <form>
-                <label for="config-encrypt-ciphertext">Ciphertext:</label>
+                <label for="aes-encrypt-ciphertext">Ciphertext:</label>
                 <br>
-                <textarea id="config-encrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="aes-encrypt-ciphertext" name="ciphertext" rows="8" cols="100" disabled></textarea>
             </form>
         </div>
         <div id="tabs-6">
             <form>
-                <label for="config-decrypt-secret">Secret:</label>
+                <label for="aes-decrypt-secret">Secret:</label>
                 <br>
-                <input type="text" id="config-decrypt-secret" name="secret">
+                <input type="text" id="aes-decrypt-secret" name="secret">
                 <br>
-                <label for="config-decrypt-iv">IV:</label>
+                <label for="aes-decrypt-iv">IV:</label>
                 <br>
-                <input type="text" id="config-decrypt-iv" name="iv">
+                <input type="text" id="aes-decrypt-iv" name="iv">
                 <br>
-                <label for="config-decrypt-ciphertext">Ciphertext:</label>
+                <label for="aes-decrypt-ciphertext">Ciphertext:</label>
                 <br>
-                <textarea id="config-decrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="aes-decrypt-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
                 <br>
                 <br>
-                <button type="button" id="config-decrypt">Decrypt</button>
-                <button type="button" id="config-decrypt-content-clear">Clear</button>
+                <button type="button" id="aes-decrypt">Decrypt</button>
+                <button type="button" id="aes-decrypt-content-copy">Copy</button>
+                <button type="button" id="aes-decrypt-content-clear">Clear</button>
             </form>
             <form>
-                <label for="config-decrypt-content">Content:</label>
+                <label for="aes-decrypt-content">Content:</label>
                 <br>
-                <textarea id="config-decrypt-content" name="content" rows="8" cols="100"></textarea>
+                <textarea id="aes-decrypt-content" name="content" rows="8" cols="100" disabled></textarea>
             </form>
         </div>
     </div>
