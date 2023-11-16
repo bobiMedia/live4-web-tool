@@ -26,13 +26,13 @@
                 // 檢查輸入
                 var station = $("#web-encrypt-station").val();
                 if (!station || station.length != 10) {
-                    alert("Station 長度錯誤")
+                    notification("error", "Station 長度錯誤")
                     return
                 }
 
                 var iv = $("#web-encrypt-iv").val();
                 if (!iv || iv.length != 16) {
-                    alert("IV 長度錯誤")
+                    notification("error", "IV 長度錯誤")
                     return
                 }
 
@@ -49,14 +49,15 @@
 
                 // 加密結果
                 if (!ciphertext) {
-                    alert("網頁加密失敗");
+                    notification("error", "網頁加密失敗");
                 } else {
-                    alert("網頁加密成功");
+                    notification("info", "網頁加密成功");
                 }
             });
             $("#web-encrypt-copy").click(function () {
                 var val = $("#web-encrypt-ciphertext").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#web-encrypt-ciphertext-clear").click(function () {
                 $("#web-encrypt-ciphertext").val("");
@@ -74,7 +75,7 @@
                 // 檢查輸入
                 var station = $("#web-decrypt-station").val();
                 if (!station || station.length != 10) {
-                    alert("Station 長度錯誤")
+                    notification("error", "Station 長度錯誤")
                     return
                 }
 
@@ -88,10 +89,10 @@
                     $("#web-decrypt-iv").val(iv);
                     var content = decryptAes(aesCiphertext, key, iv);
                     $("#web-decrypt-content").val(content);
-                    alert("網頁解密成功");
+                    notification("info", "網頁解密成功");
                 } catch (e) {
                     console.error(e)
-                    alert("網頁解密失敗");
+                    notification("error", "網頁解密失敗");
                 }
             });
             $("#web-decrypt-content-format").click(function () {
@@ -106,6 +107,7 @@
             $("#web-decrypt-content-copy").click(function () {
                 var val = $("#web-decrypt-content").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#web-decrypt-content-clear").click(function () {
                 $("#web-decrypt-content").val("");
@@ -131,9 +133,9 @@
 
                 // 加密結果
                 if (!info || !sign) {
-                    alert("OpenAPI 加密失敗");
+                    notification("error", "OpenAPI 加密失敗");
                 } else {
-                    alert("OpenAPI 加密成功");
+                    notification("info", "OpenAPI 加密成功");
                 }
             });
             $("#openapi-encode-result-copy").click(function () {
@@ -141,6 +143,7 @@
                 var sign = $("#openapi-encode-sign").val();
                 var query = "?info=" + info + "&sign=" + sign;
                 navigator.clipboard.writeText(query);
+                notification("warn", "Copy to clipboard success")
             });
             $("#openapi-encode-result-clear").click(function () {
                 $("#openapi-encode-info").val("");
@@ -162,14 +165,14 @@
 
                     var correctSign = CryptoJS.MD5(info + saltKey).toString();
                     if (sign != correctSign) {
-                        alert("Sign 錯誤");
+                        notification("error", "Sign 錯誤");
                         return;
                     }
 
-                    alert("OpenAPI 解密成功");
+                    notification("info", "OpenAPI 解密成功");
                 } catch (e) {
                     console.error(e)
-                    alert("OpenAPI 解密失敗");
+                    notification("error", "OpenAPI 解密失敗");
                 }
             });
             $("#openapi-decode-content-format").click(function () {
@@ -184,6 +187,7 @@
             $("#openapi-decode-content-copy").click(function () {
                 var val = $("#openapi-decode-content").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#openapi-decode-content-clear").click(function () {
                 $("#openapi-decode-content").val("");
@@ -200,13 +204,13 @@
                 // 檢查輸入
                 var key = $("#aes-encrypt-secret").val();
                 if (!key || key.length != 16) {
-                    alert("Secret 長度錯誤")
+                    notification("error", "Secret 長度錯誤")
                     return
                 }
 
                 var iv = $("#aes-encrypt-iv").val();
                 if (!iv || iv.length != 16) {
-                    alert("IV 長度錯誤")
+                    notification("error", "IV 長度錯誤")
                     return
                 }
 
@@ -221,14 +225,15 @@
 
                 // 加密結果
                 if (!ciphertext) {
-                    alert("Config 加密失敗");
+                    notification("error", "Config 加密失敗");
                 } else {
-                    alert("Config 加密成功");
+                    notification("info", "Config 加密成功");
                 }
             });
             $("#aes-encrypt-ciphertext-copy").click(function () {
                 var val = $("#aes-encrypt-ciphertext").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#aes-encrypt-ciphertext-clear").click(function () {
                 $("#aes-encrypt-ciphertext").val("");
@@ -242,13 +247,13 @@
                 // 檢查輸入
                 var key = $("#aes-decrypt-secret").val();
                 if (!key || key.length != 16) {
-                    alert("Secret 長度錯誤")
+                    notification("error", "Secret 長度錯誤")
                     return
                 }
 
                 var iv = $("#aes-decrypt-iv").val();
                 if (!iv || iv.length != 16) {
-                    alert("IV 長度錯誤")
+                    notification("error", "IV 長度錯誤")
                     return
                 }
 
@@ -257,15 +262,16 @@
                     var ciphertext = $("#aes-decrypt-ciphertext").val();
                     var content = decryptAes(ciphertext, key, iv);
                     $("#aes-decrypt-content").val(content);
-                    alert("Config 解密成功");
+                    notification("info", "Config 解密成功");
                 } catch (e) {
                     console.error(e)
-                    alert("Config 解密失敗");
+                    notification("error", "Config 解密失敗");
                 }
             });
             $("#aes-decrypt-content-copy").click(function () {
                 var val = $("#aes-decrypt-content").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#aes-decrypt-content-clear").click(function () {
                 $("#aes-decrypt-content").val("");
@@ -281,15 +287,16 @@
                     var content = $("#base64-encode-content").val();
                     var ciphertext = encodeBase64(content);
                     $("#base64-encode-ciphertext").val(ciphertext);
-                    alert("Base64 加密成功");
+                    notification("info", "Base64 加密成功");
                 } catch (e) {
                     console.error(e)
-                    alert("Base64 加密失敗");
+                    notification("error", "Base64 加密失敗");
                 }
             });
             $("#base64-encode-ciphertext-copy").click(function () {
                 var val = $("#base64-encode-ciphertext").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#base64-encode-ciphertext-clear").click(function () {
                 $("#base64-encode-ciphertext").val("");
@@ -305,15 +312,16 @@
                     var ciphertext = $("#base64-decode-ciphertext").val();
                     var content = decodeBase64(ciphertext);
                     $("#base64-decode-content").val(content);
-                    alert("網頁解密成功");
+                    notification("info", "網頁解密成功");
                 } catch (e) {
                     console.error(e)
-                    alert("網頁解密失敗");
+                    notification("error", "網頁解密失敗");
                 }
             });
             $("#base64-decode-content-copy").click(function () {
                 var val = $("#base64-decode-content").val();
                 navigator.clipboard.writeText(val);
+                notification("warn", "Copy to clipboard success")
             });
             $("#base64-decode-content-clear").click(function () {
                 $("#base64-decode-content").val("");
@@ -380,10 +388,59 @@
             var obj = JSON.parse(str)
             return JSON.stringify(obj, null, 4)
         }
+
+        function notification(level, msg) {
+            // 依據等級，改變 class
+            var cssState = "ui-state-active"
+            var cssIcon = "ui-icon-info"
+            if (level == "error") {
+                cssState = "ui-state-error"
+                cssIcon = "ui-icon-alert"
+            }
+            if (level == "warn") {
+                cssState = "ui-state-highlight"
+
+            }
+
+            // 組成新插入的 html
+            var html = "";
+            html += "<div class=\"" + cssState + " ui-corner-all\" style=\"margin-top: 10px; padding: 0 .7em;\" onclick=\"closeNotification($(this),0)\">";
+            html += "<p>";
+            html += "<span class=\"ui-icon " + cssIcon + "\" style=\"float: left; margin-right: .3em;\"></span>"
+            html += msg;
+            html += "</p>";
+            html += "</div>";
+            element = $(html)
+
+            // 插入 html
+            $("#notification-container .ui-widget").prepend(element);
+
+            // 設定 2 秒後自動關閉
+            closeNotification(element, 2000);
+        }
+
+        function closeNotification(element, time) {
+            setTimeout(function () {
+                element.fadeOut(750, function () {
+                    element.remove();
+                });
+            }, time);
+        }
     </script>
+    <style>
+        .notification-container {
+            height: calc(100vh - 40px);
+            width: 280px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- 主要內容 -->
     <div id="tabs">
         <ul>
             <li>
@@ -429,6 +486,7 @@
                 <br>
                 <br>
                 <button type="button" id="web-encrypt">Encrypt</button>
+                <button type="button" id="web-encrypt-copy">Copy</button>
                 <button type="button" id="web-encrypt-ciphertext-clear">Clear</button>
             </form>
             <form>
@@ -603,6 +661,11 @@
                 <br>
                 <textarea id="base64-decode-content" name="content" rows="8" cols="100" disabled></textarea>
             </form>
+        </div>
+    </div>
+    <!-- 提示區 -->
+    <div id="notification-container" class="notification-container">
+        <div class="ui-widget">
         </div>
     </div>
 </body>
