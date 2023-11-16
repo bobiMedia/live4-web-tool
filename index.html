@@ -136,7 +136,7 @@
                     alert("OpenAPI 加密成功");
                 }
             });
-            $("#openapi-encode-copy").click(function () {
+            $("#openapi-encode-result-copy").click(function () {
                 var info = $("#openapi-encode-info").val();
                 var sign = $("#openapi-encode-sign").val();
                 var query = "?info=" + info + "&sign=" + sign;
@@ -270,6 +270,54 @@
             $("#aes-decrypt-content-clear").click(function () {
                 $("#aes-decrypt-content").val("");
             });
+
+            // Base64 加密
+            $("#base64-encode").click(function () {
+                // 清空舊資料
+                $("#base64-encode-ciphertext").val("");
+
+                // 加密
+                try {
+                    var content = $("#base64-encode-content").val();
+                    var ciphertext = encodeBase64(content);
+                    $("#base64-encode-ciphertext").val(ciphertext);
+                    alert("Base64 加密成功");
+                } catch (e) {
+                    console.error(e)
+                    alert("Base64 加密失敗");
+                }
+            });
+            $("#base64-encode-ciphertext-copy").click(function () {
+                var val = $("#base64-encode-ciphertext").val();
+                navigator.clipboard.writeText(val);
+            });
+            $("#base64-encode-ciphertext-clear").click(function () {
+                $("#base64-encode-ciphertext").val("");
+            });
+
+            // Base64 解密
+            $("#base64-decode").click(function () {
+                // 清空舊資料
+                $("#base64-decode-content").val("");
+
+                // 解密
+                try {
+                    var ciphertext = $("#base64-decode-ciphertext").val();
+                    var content = decodeBase64(ciphertext);
+                    $("#base64-decode-content").val(content);
+                    alert("網頁解密成功");
+                } catch (e) {
+                    console.error(e)
+                    alert("網頁解密失敗");
+                }
+            });
+            $("#base64-decode-content-copy").click(function () {
+                var val = $("#base64-decode-content").val();
+                navigator.clipboard.writeText(val);
+            });
+            $("#base64-decode-content-clear").click(function () {
+                $("#base64-decode-content").val("");
+            });
         });
 
         function randomString(length) {
@@ -356,6 +404,12 @@
             <li>
                 <a href="#tabs-6">AES 解密 (Config 解密)</a>
             </li>
+            <li>
+                <a href="#tabs-7">Base64 加密</a>
+            </li>
+            <li>
+                <a href="#tabs-8">Base64 解密</a>
+            </li>
         </ul>
         <div id="tabs-1">
             <form>
@@ -371,7 +425,7 @@
                 <br>
                 <label for="web-encrypt-content">Content:</label>
                 <br>
-                <textarea id="web-encrypt-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="web-encrypt-content" name="content" rows="8" cols="100"></textarea>
                 <br>
                 <br>
                 <button type="button" id="web-encrypt">Encrypt</button>
@@ -422,11 +476,11 @@
                 <br>
                 <label for="openapi-encode-content">Content:</label>
                 <br>
-                <textarea id="openapi-encode-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="openapi-encode-content" name="content" rows="8" cols="100"></textarea>
                 <br>
                 <br>
-                <button type="button" id="openapi-encode">Decrypt</button>
-                <button type="button" id="openapi-encode-copy">Copy Query String</button>
+                <button type="button" id="openapi-encode">Encode</button>
+                <button type="button" id="openapi-encode-result-copy">Copy Query String</button>
                 <button type="button" id="openapi-encode-result-clear">Clear</button>
             </form>
             <form>
@@ -454,7 +508,7 @@
                 <textarea id="openapi-decode-sign" name="sign" rows="4" cols="100"></textarea>
                 <br>
                 <br>
-                <button type="button" id="openapi-decode">Decrypt</button>
+                <button type="button" id="openapi-decode">Decode</button>
                 <button type="button" id="openapi-decode-content-format">Format</button>
                 <button type="button" id="openapi-decode-content-copy">Copy</button>
                 <button type="button" id="openapi-decode-content-clear">Clear</button>
@@ -478,7 +532,7 @@
                 <br>
                 <label for="aes-encrypt-content">Content:</label>
                 <br>
-                <textarea id="aes-encrypt-content" name="ciphertext" rows="8" cols="100"></textarea>
+                <textarea id="aes-encrypt-content" name="content" rows="8" cols="100"></textarea>
                 <br>
                 <br>
                 <button type="button" id="aes-encrypt">Encrypt</button>
@@ -514,6 +568,40 @@
                 <label for="aes-decrypt-content">Content:</label>
                 <br>
                 <textarea id="aes-decrypt-content" name="content" rows="8" cols="100" disabled></textarea>
+            </form>
+        </div>
+        <div id="tabs-7">
+            <form>
+                <label for="base64-encode-content">Content:</label>
+                <br>
+                <textarea id="base64-encode-content" name="content" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="base64-encode">Encode</button>
+                <button type="button" id="base64-encode-ciphertext-copy">Copy</button>
+                <button type="button" id="base64-encode-ciphertext-clear">Clear</button>
+            </form>
+            <form>
+                <label for="base64-encode-ciphertext">Ciphertext:</label>
+                <br>
+                <textarea id="base64-encode-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+            </form>
+        </div>
+        <div id="tabs-8">
+            <form>
+                <label for="base64-decode-ciphertext">Ciphertext:</label>
+                <br>
+                <textarea id="base64-decode-ciphertext" name="ciphertext" rows="8" cols="100"></textarea>
+                <br>
+                <br>
+                <button type="button" id="base64-decode">Decode</button>
+                <button type="button" id="base64-decode-content-copy">Copy</button>
+                <button type="button" id="base64-decode-content-clear">Clear</button>
+            </form>
+            <form>
+                <label for="base64-decode-content">Content:</label>
+                <br>
+                <textarea id="base64-decode-content" name="content" rows="8" cols="100"></textarea>
             </form>
         </div>
     </div>
