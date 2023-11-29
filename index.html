@@ -312,11 +312,20 @@
                     var ciphertext = $("#base64-decode-ciphertext").val();
                     var content = decodeBase64(ciphertext);
                     $("#base64-decode-content").val(content);
-                    notification("info", "網頁解密成功");
+                    notification("info", "Base64 解密成功");
                 } catch (e) {
                     console.error(e)
-                    notification("error", "網頁解密失敗");
+                    notification("error", "Base64 解密失敗");
                 }
+            });
+            $("#base64-decode-content-format").click(function () {
+                try {
+                    var content = $("#base64-decode-content").val();
+                    content = formatJson(content)
+                    if (content) {
+                        $("#base64-decode-content").val(content);
+                    }
+                } catch (e) { }
             });
             $("#base64-decode-content-copy").click(function () {
                 var val = $("#base64-decode-content").val();
@@ -653,6 +662,7 @@
                 <br>
                 <br>
                 <button type="button" id="base64-decode">Decode</button>
+                <button type="button" id="base64-decode-content-format">Format</button>
                 <button type="button" id="base64-decode-content-copy">Copy</button>
                 <button type="button" id="base64-decode-content-clear">Clear</button>
             </form>
