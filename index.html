@@ -277,6 +277,18 @@
                 $("#aes-decrypt-content").val("");
             });
 
+            // Config 加解密預設值
+            var cbc_key = (new URL(location.href)).searchParams.get('cbc_key');
+            var cbc_iv = (new URL(location.href)).searchParams.get('cbc_iv');
+            if (cbc_key) {
+                $("#aes-encrypt-secret").val(cbc_key);
+                $("#aes-decrypt-secret").val(cbc_key);
+            }
+            if (cbc_iv) {
+                $("#aes-encrypt-iv").val(cbc_iv);
+                $("#aes-decrypt-iv").val(cbc_iv);
+            }
+
             // Base64 加密
             $("#base64-encode").click(function () {
                 // 清空舊資料
