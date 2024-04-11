@@ -193,6 +193,13 @@
                 $("#openapi-decode-content").val("");
             });
 
+            // Open API 加解密預設值
+            var openapi_salt = (new URL(location.href)).searchParams.get('openapi_salt');
+            if (openapi_salt) {
+                $("#openapi-encode-salt").val(openapi_salt);
+                $("#openapi-decode-salt").val(openapi_salt);
+            }
+
             // Config 加密
             $("#aes-encrypt-iv-random").click(function () {
                 $("#aes-encrypt-iv").val(randomString(16));
